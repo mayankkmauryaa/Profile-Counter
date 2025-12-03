@@ -1,0 +1,38 @@
+name: Update Profile Badges (daily)
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # daily at 00:00 UTC (choose your preferred cron)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies (none required)
+        run: echo "No npm deps. Using built-in fs."
+
+      - name: Run badge generator
+        run: |
+          node generate_badges.js
+
+      - name: Commit & push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions[bot]
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          message: "chore: update generated profile badges"
+          add: "badges.html, styles.css, README.md"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
